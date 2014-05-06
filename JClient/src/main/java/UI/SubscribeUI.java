@@ -11,9 +11,12 @@ import static Core.NetworkThread.titles;
 import Core.Opcode;
 import static Core.Opcode.CMSG_GET_SUBLIST;
 import static Core.Opcode.CMSG_SUBSCRIBE;
+import static Core.Opcode.CMSG_UNSUBSCRIBE;
 import static Core.Opcode.СMSG_ADD_NEW_SUBSCRIBE;
 import Core.Packet;
 import Core.UICore;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -168,6 +171,30 @@ public class SubscribeUI extends javax.swing.JFrame {
                 
             }
         });
+     
+     jButton4.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+
+                tryUnSubscrube();
+                //jOptionPane1.showMessageDialog(null, "Вы не выбрали запись в таблице.");
+                
+            }
+        });
+     
+        jButton1.setBackground(new Color(59, 89, 182));
+        jButton1.setForeground(Color.WHITE);
+        jButton1.setFocusPainted(false);
+        jButton1.setFont(new Font("Tahoma", Font.BOLD, 12));
+
+        jButton3.setBackground(new Color(59, 89, 182));
+        jButton3.setForeground(Color.WHITE);
+        jButton3.setFocusPainted(false);
+        jButton3.setFont(new Font("Tahoma", Font.BOLD, 12));
+
+        jButton4.setBackground(new Color(59, 89, 182));
+        jButton4.setForeground(Color.WHITE);
+        jButton4.setFocusPainted(false);
+        jButton4.setFont(new Font("Tahoma", Font.BOLD, 12));
 
 }
     
@@ -198,6 +225,26 @@ public class SubscribeUI extends javax.swing.JFrame {
         if (!select_value.equals(""))
         {
             Packet p = new Packet(CMSG_SUBSCRIBE);
+            p.put(select_value);
+            
+            NetworkManager.SendPacket(p);
+            
+            tryGetSubscribeList();
+            populateTable();
+            //dispose();
+        }
+        else {
+            jOptionPane1.showMessageDialog(null, "Вы не выбрали подписку.", "Ошибка", jOptionPane1.ERROR_MESSAGE);
+        }
+
+    }
+    
+    public void tryUnSubscrube()
+    {
+
+        if (!select_value.equals(""))
+        {
+            Packet p = new Packet(CMSG_UNSUBSCRIBE);
             p.put(select_value);
             
             NetworkManager.SendPacket(p);
@@ -265,6 +312,8 @@ public class SubscribeUI extends javax.swing.JFrame {
                 "Название", "Статус", "Написать"
             }
         ));
+        jTable1.getTableHeader().setResizingAllowed(false);
+        jTable1.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(jTable1);
 
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
@@ -288,7 +337,7 @@ public class SubscribeUI extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 461, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -305,7 +354,7 @@ public class SubscribeUI extends javax.swing.JFrame {
                 .addGap(23, 23, 23)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jButton1))
                     .addComponent(jButton3))
                 .addGap(18, 18, 18)

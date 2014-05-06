@@ -8,7 +8,6 @@ import Core.Packet;
 import Core.TextAndIcon;
 import Core.UICore;
 import java.awt.AWTException;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
@@ -37,8 +36,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -86,6 +90,7 @@ public class MasterUI extends JFrame implements Opcode
     private JButton btnExit;
     private JButton btnReg;
     private JButton btnSubscribe;
+    private JButton btnOptions;
     
     private JTextField txtUsername;
     private JPasswordField txtPassword;
@@ -114,6 +119,10 @@ public class MasterUI extends JFrame implements Opcode
     //private String[] loginAsStatus = {"Доступен", "Отсутствует", "Занят", "Offline"};
     public static String[] status = {"Доступен", "Отсутствует", "Занят", "Offline", "Выход"};
     public static ImageIcon[] images;
+
+    public static DefaultListModel sortedmodel;
+
+
     
     public MasterUI()
     {
@@ -137,7 +146,7 @@ public class MasterUI extends JFrame implements Opcode
         
         BufferedImage myPicture;
         try {
-            System.out.println(getClass().getResource("/Images/icon_main.png").getPath());
+            //System.out.println(getClass().getResource("/Images/icon_main.png").getPath());
             myPicture = ImageIO.read(new File(getClass().getResource("/Images/icon_main.png").getPath()));
             JLabel picLabel = new JLabel(new ImageIcon(myPicture));
             loginPanel.add(picLabel);
@@ -157,6 +166,7 @@ public class MasterUI extends JFrame implements Opcode
         btnReg = new JButton("Регистрация");
         //btnExit = new JButton("Выход");
         btnSubscribe = new JButton("Подписки");
+        btnOptions = new JButton("Настройки");
         
         btnLogin.setBackground(new Color(59, 89, 182));
         btnLogin.setForeground(Color.WHITE);
@@ -172,6 +182,11 @@ public class MasterUI extends JFrame implements Opcode
         btnSubscribe.setForeground(Color.WHITE);
         btnSubscribe.setFocusPainted(false);
         btnSubscribe.setFont(new Font("Tahoma", Font.BOLD, 12));
+        
+        btnOptions.setBackground(new Color(59, 89, 182));
+        btnOptions.setForeground(Color.WHITE);
+        btnOptions.setFocusPainted(false);
+        btnOptions.setFont(new Font("Tahoma", Font.BOLD, 12));
         
         loginPanel.add(lblPassword);
         loginPanel.add(lblUsername);
@@ -190,15 +205,15 @@ public class MasterUI extends JFrame implements Opcode
         txtUsername.setBounds(25, 230, 220, 25);
         //cbLoginAsStatus.setBounds(25, 250, 220, 25);
         btnLogin.setBounds(25, 330, 80, 25);
-        btnReg.setBounds(125, 330, 120, 25);
+        btnReg.setBounds(120, 330, 125, 25);
         //btnExit.setBounds(150, 420, 100, 25);
         
         /* Contact List Interface */
         lblTitle = new JLabel();
-        lblPSM = new JLabel();
+        //lblPSM = new JLabel();
         
-        txtTitle = new JTextField();
-        txtPSM = new JTextField();
+        //txtTitle = new JTextField();
+        //txtPSM = new JTextField();
         
         cbStatus = new JComboBox(status);
         
@@ -210,34 +225,36 @@ public class MasterUI extends JFrame implements Opcode
         contactListPane = new JScrollPane(contactList);
         
         contactPanel.add(lblTitle);
-        contactPanel.add(txtTitle);
-        contactPanel.add(lblPSM);
-        contactPanel.add(txtPSM);
+        //contactPanel.add(txtTitle);
+        //contactPanel.add(lblPSM);
+        //contactPanel.add(txtPSM);
         contactPanel.add(cbStatus);
         //contactPanel.add(btnAddContact);
         //contactPanel.add(btnRemoveContact);
         contactPanel.add(contactListPane);
         contactPanel.add(btnSubscribe);
+        contactPanel.add(btnOptions);
         
-        
-        lblTitle.setBounds(15, 10, 240, 25);
-        txtTitle.setBounds(15, 10, 240, 25);
-        lblPSM.setBounds(15, 35, 240, 25);
-        txtPSM.setBounds(15, 35, 240, 25);
-        cbStatus.setBounds(10, 65, 245, 25);
+        lblTitle.setBounds(10, 10, 240, 25);
+        //txtTitle.setBounds(10, 10, 240, 25);
+        //lblPSM.setBounds(15, 35, 240, 25);
+        //txtPSM.setBounds(15, 35, 240, 25);
+        cbStatus.setBounds(10, 40, 245, 25);
         //btnAddContact.setBounds(10, 100, 120, 25);
         //btnRemoveContact.setBounds(135, 100, 120, 25);
-        contactListPane.setBounds(10, 160, 245, 180);
-        btnSubscribe.setBounds(10, 130, 120, 25);
+        contactListPane.setBounds(10, 110, 245, 230);
+        btnSubscribe.setBounds(10, 75, 110, 25);
+        btnOptions.setBounds(145, 75, 110, 25);
         
         loginPanel.setBounds(0, 0, 270, 500);
         contactPanel.setBounds(270 , 0, 270, 350);
         
         lblTitle.setFont(new Font("sansserif", Font.BOLD, 16));
-        lblPSM.setFont(new Font("sansserif", Font.PLAIN, 12));
+        lblTitle.setVisible(true);
+        //lblPSM.setFont(new Font("sansserif", Font.PLAIN, 12));
         
-        txtTitle.setVisible(false);
-        txtPSM.setVisible(false);
+        //txtTitle.setVisible(false);
+        //txtPSM.setVisible(false);
         
 //        miRoomJoin.setEnabled(false);
 //        miRoomCreate.setEnabled(false);
@@ -262,17 +279,17 @@ public class MasterUI extends JFrame implements Opcode
 //        miRoomJoin.addActionListener(menuListener);
 //        miRoomCreate.addActionListener(menuListener);
         
-        txtTitle.addFocusListener(focusListener);
-        txtPSM.addFocusListener(focusListener);
+        //txtTitle.addFocusListener(focusListener);
+//      txtPSM.addFocusListener(focusListener);
         
         txtUsername.addKeyListener(loginKeyListener);
         txtPassword.addKeyListener(loginKeyListener);
         
-        txtTitle.addKeyListener(contactKeyListener);
-        txtPSM.addKeyListener(contactKeyListener);
+        //txtTitle.addKeyListener(contactKeyListener);
+//      txtPSM.addKeyListener(contactKeyListener);
         
         lblTitle.addMouseListener(mouseListener);
-        lblPSM.addMouseListener(mouseListener);
+//      lblPSM.addMouseListener(mouseListener);
         contactList.addMouseListener(mouseListener);
         
         addWindowListener(winListener);
@@ -364,9 +381,9 @@ public class MasterUI extends JFrame implements Opcode
         
         lblTitle.setText(AccountDetail.getDisplayTitle());
         
-        lblPSM.setText(psm.equals("") ? "<Здесь персональный статус>" : psm);
-        lblPSM.setFont(new Font("sansserif", psm.equals("") ? Font.ITALIC : Font.PLAIN, 12));
-        lblPSM.setForeground(psm.equals("") ? Color.GRAY : Color.BLACK);
+        //lblPSM.setText(psm.equals("") ? "<Здесь персональный статус>" : psm);
+        //lblPSM.setFont(new Font("sansserif", psm.equals("") ? Font.ITALIC : Font.PLAIN, 12));
+        //lblPSM.setForeground(psm.equals("") ? Color.GRAY : Color.BLACK);
         
         cbStatus.setSelectedIndex(AccountDetail.getStatus());
         
@@ -410,6 +427,22 @@ public class MasterUI extends JFrame implements Opcode
         {
             c.setStatus(status);
             
+            /*TODO: sort contact list 
+            TreeSet<Contact> sortedListCont = new TreeSet<Contact>((SortedSet<Contact>) new ContactComp());
+            
+            for (int i = 0; i < model.getSize(); i++) {
+                sortedListCont.add((Contact)model.elementAt(i));
+            } 
+            
+            model.clear();
+            
+            for(Contact p : sortedListCont){
+                model.addElement(p);
+            }
+            
+            //System.out.println(model); 
+            */
+            
             ListCellRenderer renderer = contactList.getCellRenderer();
             contactList.repaint();
             contactList.setModel(model);
@@ -418,7 +451,7 @@ public class MasterUI extends JFrame implements Opcode
             //contactList.setCellRenderer(new TextAndIconListCellRenderer(2));
             contactList.repaint();
         }
-        System.out.println(model);
+        //System.out.println(model);
     }
     
     public void UpdateContactDetail(int guid, String title, String psm)
@@ -431,8 +464,10 @@ public class MasterUI extends JFrame implements Opcode
             if (title != null)
                 c.setTitle(title);
             
+            /*
             if (psm != null)
                 c.setPSM(psm);
+            */
             
             contactList.repaint();
         }
@@ -474,7 +509,7 @@ public class MasterUI extends JFrame implements Opcode
         {
             model.clear();
             lblTitle.setText("");
-            lblPSM.setText("");
+//          lblPSM.setText("");
             cbStatus.setSelectedIndex(0);
         }
     }
@@ -583,21 +618,22 @@ public class MasterUI extends JFrame implements Opcode
     {
         public void focusLost(FocusEvent e)
         {
+            /*
             if (e.getSource().equals(txtTitle))
             {
-                txtTitle.setVisible(false);
+                //txtTitle.setVisible(false);
                 lblTitle.setVisible(true);
                 
                 return;
             }
-            
+           
             if (e.getSource().equals(txtPSM))
             {
                 txtPSM.setVisible(false);
                 lblPSM.setVisible(true);
                 
                 return;
-            }
+            }*/
         }
     };
     
@@ -617,6 +653,7 @@ public class MasterUI extends JFrame implements Opcode
         {
             if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
             {
+                /*
                 if (e.getSource().equals(txtTitle))
                 {
                     txtTitle.setVisible(false);
@@ -632,10 +669,13 @@ public class MasterUI extends JFrame implements Opcode
                     
                     return;
                 }
+                */
             }
             
             if (e.getKeyCode() == KeyEvent.VK_ENTER)
             {
+                
+                 /*
                 if (e.getSource().equals(txtTitle))
                 {
                     String newTitle = txtTitle.getText().trim();
@@ -656,6 +696,7 @@ public class MasterUI extends JFrame implements Opcode
                     lblTitle.setVisible(true);
                 }
                 
+               
                 if (e.getSource().equals(txtPSM))
                 {
                     String newPSM = txtPSM.getText().trim();
@@ -677,7 +718,7 @@ public class MasterUI extends JFrame implements Opcode
                     txtPSM.setVisible(false);
                     lblPSM.setVisible(true);
                 }
-                
+                */
                 updateUITitle();
             }
         }
@@ -687,15 +728,19 @@ public class MasterUI extends JFrame implements Opcode
     {
         public void mouseClicked(MouseEvent e)
         {
+            /*
             if (e.getSource().equals(lblTitle))
             {
+                
                 lblTitle.setVisible(false);
                 txtTitle.setVisible(true);
                 
                 txtTitle.setText(AccountDetail.getTitle());
                 txtTitle.requestFocusInWindow();
+               
             }
             
+            /*
             if (e.getSource().equals(lblPSM))
             {
                 lblPSM.setVisible(false);
@@ -704,6 +749,7 @@ public class MasterUI extends JFrame implements Opcode
                 txtPSM.setText(AccountDetail.getPSM());
                 txtPSM.requestFocusInWindow();
             }
+            */
             
             // Handle double click event of contact list.
             // Open contact ChatUI when client is double click on contact detail.
@@ -907,5 +953,14 @@ class IconListRenderer
 		label.setIcon(icon);
 		return label;
 	}
+
+}
+
+class ContactComp implements Comparator<ArrayList<String>> {
+
+    @Override
+    public int compare(ArrayList<String> o1, ArrayList<String> o2) {
+        return o1.toString().compareTo(o2.toString());
+    }
 
 }

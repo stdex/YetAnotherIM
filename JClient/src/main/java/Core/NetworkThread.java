@@ -5,6 +5,7 @@ import UI.ContactRequestUI;
 import UI.RoomChatUI;
 import UI.RoomFormUI;
 import UI.SendSubUI;
+import static UI.SendSubUI.logChat;
 import UI.SubscribeUI;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -166,7 +167,7 @@ public class NetworkThread implements Runnable, Opcode
         sessionStatus = SessionStatus.READY;
         ProcessQueuePacket();
         UICore.getMasterUI().contactList.repaint();
-        System.out.println(UICore.getMasterUI().model); 
+        //System.out.println(UICore.getMasterUI().model); 
                             
       // If login is succefully, check offline messages
                    
@@ -256,7 +257,10 @@ public class NetworkThread implements Runnable, Opcode
         Packet p = new Packet(CMSG_GET_IN_SUB);
         p.put(messageid);
         NetworkManager.SendPacket(p);
-                
+        
+        String outputMSG = new StringBuilder(String.format("%s:: ", currentTime)).append(String.format("%s :: ", senderGuid)).append(String.format("     %s\n", message)).toString();
+        logChat(outputMSG, title, senderGuid, "in");
+
         // Output the message in sender ChatUI.
         //targetUI.append(Integer.toString(senderGuid), message, currentTime);
         targetUI.append(senderGuid, message, currentTime);
@@ -301,14 +305,33 @@ public class NetworkThread implements Runnable, Opcode
         UI.SubscribeUI.jTable1.setModel(tableModel);
         
     }
-  
+
+    void HandleUnSubscribeSuccessOpcode(Packet packet)
+    {
+        Packet p = new Packet(CMSG_GET_SUBLIST);
+        NetworkManager.SendPacket(p);    
+        
+        DefaultTableModel tableModel = new DefaultTableModel();
+        tableModel = (DefaultTableModel) UI.SubscribeUI.jTable1.getModel();
+        tableModel.setNumRows(0);
+      
+        for (int count = 0; count < titles.size(); count++){
+            tableModel.addRow(new Object[]{1});
+            tableModel.setValueAt(titles.get(count).getTitle(), count, 0);
+            tableModel.setValueAt(titles.get(count).getStatus(), count, 1);
+            tableModel.setValueAt("-->", count, 2);
+        }
+        
+        UI.SubscribeUI.jTable1.setModel(tableModel);
+        
+    }
     
     void HandleContactStatusChangedOpcode(Packet packet)
     {
         int guid = (Integer)packet.get();
         int status = (Integer)packet.get();
         
-        System.out.println(guid+" :: "+status);
+        //System.out.println(guid+" :: "+status);
         
         UICore.UpdateContactStatus(guid, status);
     }

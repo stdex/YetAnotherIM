@@ -2,11 +2,15 @@ package UI;
 
 import Core.AccountDetail;
 import Core.Contact;
+import Core.Main;
 import Core.NetworkManager;
 import Core.Opcode;
 import Core.Packet;
 import Core.UICore;
-
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -19,12 +23,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.net.URISyntaxException;
+import java.security.CodeSource;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
@@ -37,6 +44,7 @@ public final class ChatUI extends JFrame implements Opcode
     
     JTextArea txtOutput;
     JTextArea txtInput;
+    private JButton btnSend;
     
     public ChatUI(Contact c)
     {
@@ -49,18 +57,30 @@ public final class ChatUI extends JFrame implements Opcode
         txtOutput = new JTextArea();
         txtInput = new JTextArea();
         
+        btnSend = new JButton("1");
+        
+        btnSend.setBackground(new Color(59, 89, 182));
+        btnSend.setForeground(Color.WHITE);
+        btnSend.setFocusPainted(false);
+        btnSend.setFont(new Font("Tahoma", Font.BOLD, 12));
+        
+        btnSend.setBounds(300, 315, 60, 100);
+        
         paneOutput = new JScrollPane(txtOutput, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS ,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         paneInput = new JScrollPane(txtInput, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED ,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+        paneOutput.setBounds(10, 10, 350, 300);
+        paneInput.setBounds(10, 315, 290, 100);
         
         add(paneOutput);
         add(paneInput);
-        
-        paneOutput.setBounds(10, 10, 350, 300);
-        paneInput.setBounds(10, 315, 350, 100);
+        add(btnSend);
         
         try {
             readAllHistory(AccountDetail.getDisplayTitle(), c.getUsername());
         } catch (IOException ex) {
+            Logger.getLogger(ChatUI.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (URISyntaxException ex) {
             Logger.getLogger(ChatUI.class.getName()).log(Level.SEVERE, null, ex);
         }
         
@@ -74,6 +94,14 @@ public final class ChatUI extends JFrame implements Opcode
         
         addWindowListener(winListener);
         txtInput.addKeyListener(keyListener);
+        
+         btnSend.addActionListener(new ActionListener() {  
+            public void actionPerformed(ActionEvent arg0)   
+            {  
+                SendMSG();
+            }  
+        });
+        
     }
     
     public void append(String from, String to, String message, String currentTime)
@@ -92,37 +120,70 @@ public final class ChatUI extends JFrame implements Opcode
     public static void logChat(String message, String from, String to, String mode) {
         try {
             
+            CodeSource codeSource = Main.class.getProtectionDomain().getCodeSource();
+
+            File jarFile = new File(codeSource.getLocation().toURI().getPath());
+            String jarDir = jarFile.getParentFile().getPath();
+            File jDir = new File(jarDir);
+            //System.out.println(jarDir);
+
             Runtime.getRuntime().exec("chmod 777 file");
+  
+            String folder = "";
+            String file = "";
             
-            boolean success = true;
+            if(mode == "out") {
+                folder = from;
+                file = to;
+            }
+            else {
+                folder = to;
+                file = from;
+            }
             
-            //File dir = new File(from);
-            //success = dir.mkdir();
+            System.out.println(folder + " : " + file);
             
-            String fl = "";
+            File dir = new File(jarDir+"/"+folder);
+            dir.mkdir();
             
-            if(mode == "out")
-                fl = to;
-            else
-                fl = from;
+            String[] chmod = { "su", "-c","chmod 777 "+dir };
+            try {
+                Runtime.getRuntime().exec(chmod);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             
-                if (success) {
-                    //System.out.println("DIR: OK");
-                    PrintWriter out = new PrintWriter(new BufferedWriter(
-                            new FileWriter(new File("uhistory_" + fl + ".txt"), true)));
+
+                if (dir.exists()) {
+                    System.out.println(dir);
+                    System.out.println(new File(jDir+"/"+folder+"/uhistory_" + file + ".txt"));
+
                     if (message != null && !message.equals("")) {
-                            out.println(message);
+                            
+                        File bfile = new File(jDir+"/"+folder+"/uhistory_" + file + ".txt");
+                        FileWriter fileWriter = new FileWriter(bfile,true);
+                        BufferedWriter bufferFileWriter  = new BufferedWriter(fileWriter);
+                        fileWriter.append(message);
+                        bufferFileWriter.close();
+       
                         }
-                    out.close();
                 }
         } catch (IOException e) {
             e.getMessage();
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(ChatUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
-    public void readAllHistory(String from, String to) throws FileNotFoundException, IOException {
+    public void readAllHistory(String from, String to) throws FileNotFoundException, IOException, URISyntaxException {
 
-        File file = new File("uhistory_" + to + ".txt");
+        CodeSource codeSource = Main.class.getProtectionDomain().getCodeSource();
+
+        File jarFile = new File(codeSource.getLocation().toURI().getPath());
+        String jarDir = jarFile.getParentFile().getPath();
+        File jDir = new File(jarDir);
+        
+        File file = new File(jDir+"/"+from+"/uhistory_" + to + ".txt");
         if(!file.exists()) return;
         
         FileInputStream fis = new FileInputStream(file);
@@ -151,6 +212,7 @@ public final class ChatUI extends JFrame implements Opcode
         UICore.getChatUIList().remove(this);
     }
     
+    
     KeyListener keyListener = new KeyAdapter()
     {
         public void keyReleased(KeyEvent e)
@@ -164,6 +226,15 @@ public final class ChatUI extends JFrame implements Opcode
                     txtInput.append("\n");
                     return;
                 }
+                
+                SendMSG();
+
+            }
+        }   
+    };
+    
+    public void SendMSG()
+    {
                 
                 // Trim the message, cancel the message sending if message is empty.
                 if (txtInput.getText().trim().equals(""))
@@ -197,9 +268,8 @@ public final class ChatUI extends JFrame implements Opcode
                 
                 // Reset the input text area.
                 txtInput.setText("");
-            }
-        }   
-    };
+    }
+    
     
     WindowListener winListener = new WindowAdapter()
     {

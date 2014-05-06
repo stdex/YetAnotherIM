@@ -139,7 +139,7 @@ public class Session implements Runnable, Opcode
         
         //ResultSet rs = Main.db.query("SELECT a.guid, a.username, a.title, a.psm FROM contact AS c LEFT JOIN account AS a ON c.c_guid = a.guid WHERE c.o_guid = %d", c.getGuid());
         
-        ResultSet rs = Main.db.query("SELECT guid, username, title, psm FROM account where guid != %d", c.getGuid());
+        ResultSet rs = Main.db.query("SELECT guid, username, title, psm FROM account where guid != %d ORDER BY online DESC", c.getGuid());
         
         Packet p;
         
@@ -397,7 +397,12 @@ public class Session implements Runnable, Opcode
     {
         String subtitle = (String)packet.get();
         System.out.println(subtitle);
-        Main.db.execute("INSERT INTO subscribe (title) VALUES('%s')", subtitle);
+      
+        ResultSet rs = Main.db.query("SELECT * FROM subscribe WHERE title='%s'", subtitle);
+        System.out.println(rs.first());
+        if (!(rs.first())) {        
+            Main.db.execute("INSERT INTO subscribe (title) VALUES('%s')", subtitle);
+        }
     }
     
     void HandleSubscribeOpcode(Packet packet) throws Exception
@@ -429,6 +434,37 @@ public class Session implements Runnable, Opcode
         
         }
     }
+    
+    void HandleUnSubscribeOpcode(Packet packet) throws Exception
+    {
+
+        String title = (String)packet.get();
+        System.out.printf("Unsubscribe topic: %s to client %d\n", title, c.getGuid());
+        
+        ResultSet rs = Main.db.query("SELECT * FROM subscribe WHERE title='%s'", title);
+        System.out.println(rs.first());
+        
+        if (rs.first()) {
+            int idSubscrube = rs.getInt("sid");
+
+            System.out.println(idSubscrube);
+            System.out.println(c.getGuid());
+
+            ResultSet rsf = Main.db.query("SELECT * FROM subscribe_account WHERE sid='%d' AND guid='%d'", idSubscrube, c.getGuid());
+            //System.out.println(rsf.first());
+
+            if (rsf.first()) {
+            Main.db.execute("DELETE FROM subscribe_account WHERE sid='%d' AND guid='%d'", idSubscrube, c.getGuid());
+            //System.out.println(rs.first());
+            }
+
+            System.out.printf("Unsubscribe success!");
+            Packet p = new Packet(SMSG_UNSUBSCRIBE_SUCCESS);
+            SendPacket(p);
+        
+        }
+    }
+    
     void HandleGetOfflineMsgOpcode(Packet packet) throws Exception
     {
          System.out.printf("Send offline messages if it is:\n");
