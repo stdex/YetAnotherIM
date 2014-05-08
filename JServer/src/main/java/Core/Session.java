@@ -139,7 +139,7 @@ public class Session implements Runnable, Opcode
         
         //ResultSet rs = Main.db.query("SELECT a.guid, a.username, a.title, a.psm FROM contact AS c LEFT JOIN account AS a ON c.c_guid = a.guid WHERE c.o_guid = %d", c.getGuid());
         
-        ResultSet rs = Main.db.query("SELECT guid, username, title, psm FROM account where guid != %d ORDER BY online DESC", c.getGuid());
+        ResultSet rs = Main.db.query("SELECT guid, username, title, psm FROM account WHERE guid != %d AND adapter != %d  ORDER BY online DESC", c.getGuid(), 1);
         
         Packet p;
         
@@ -503,6 +503,11 @@ public class Session implements Runnable, Opcode
         String msg = (String)packet.get();
         
         System.out.printf("Send message: %s in topic %s\n", msg, title);
+        
+        
+        System.out.printf("Subscribe message get success!");
+        Packet s = new Packet(SMSG_SEND_IN_SUB_SUCCESS);
+        SendPacket(s);
         
         ResultSet rs = Main.db.query("SELECT * FROM subscribe WHERE title='%s'", title);
         System.out.println(rs.first());

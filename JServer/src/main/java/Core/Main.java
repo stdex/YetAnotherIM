@@ -174,7 +174,7 @@ public class Main implements Opcode
                         if (rs.next()) {
                             int lastid = rs.getInt("id");
                             //System.out.println(lastid);
-                            db.execute("INSERT INTO account(guid, username, password, title, psm, online) VALUES('%s', '%s', '%s', '%s', '%s', '%s')", lastid+1, username, password, title, "", "0");
+                            db.execute("INSERT INTO account(guid, username, password, title, psm, online, adapter) VALUES('%s', '%s', '%s', '%s', '%s', '%s', '%s')", lastid+1, username, password, title, "", "0", "0");
                         }
                         
                             System.out.printf("Send Opcode: SMSG_REGISTRATION_SUCCESS\n");
