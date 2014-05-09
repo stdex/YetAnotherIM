@@ -200,6 +200,7 @@ public class NetworkThread implements Runnable, Opcode
         String senderGuid = (String)packet.get();
         String message = (String)packet.get();
         String currentTime = (String)packet.get();
+        String idSubscrube = (String)packet.get();
         
         System.out.println(currentTime + "::" + messageid + ":: " + senderGuid + " --> " + reciverGuid + ":: " + message);
 

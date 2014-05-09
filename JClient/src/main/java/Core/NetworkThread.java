@@ -2,6 +2,7 @@ package Core;
 
 import UI.ChatUI;
 import UI.ContactRequestUI;
+import UI.MasterUI;
 import UI.RoomChatUI;
 import UI.RoomFormUI;
 import UI.SendSubUI;
@@ -22,6 +23,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 
 import javax.swing.JOptionPane;
+import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
@@ -172,8 +174,15 @@ public class NetworkThread implements Runnable, Opcode
       // If login is succefully, check offline messages
                    
       Packet p = new Packet(CMSG_GET_OFFLINE_MSG);
-      NetworkManager.SendPacket(p);    
-                    
+      NetworkManager.SendPacket(p);
+      MasterUI.contactList.repaint();
+      MasterUI.contactList.setModel(MasterUI.model);    
+      ListCellRenderer renderer = MasterUI.contactList.getCellRenderer();
+            
+      MasterUI.contactList.repaint();
+      MasterUI.contactList.setModel(MasterUI.model);
+      MasterUI.contactList.setCellRenderer(renderer);
+      MasterUI.contactList.repaint();
     }
     
     void HandleContactAlreadyInListOpcode(Packet packet)

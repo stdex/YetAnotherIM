@@ -34,10 +34,12 @@ import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import static java.lang.Math.abs;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -404,9 +406,7 @@ public class MasterUI extends JFrame implements Opcode
     
     public void addContact(Contact c)
     {
-        
         model.addElement(c);
-        //contactList.repaint();
     }
     
     public Contact searchContact(int guid)
@@ -427,28 +427,32 @@ public class MasterUI extends JFrame implements Opcode
         {
             c.setStatus(status);
             
-            /*TODO: sort contact list 
-            TreeSet<Contact> sortedListCont = new TreeSet<Contact>((SortedSet<Contact>) new ContactComp());
+            //TODO: sort contact list 
+            ArrayList<Contact> sortedListCont = new ArrayList<Contact>();
+            
+            //System.out.println("sortedListCont:" + sortedListCont);
+            sortedListCont.clear();
             
             for (int i = 0; i < model.getSize(); i++) {
                 sortedListCont.add((Contact)model.elementAt(i));
-            } 
-            
+            }
+         
+            Collections.sort(sortedListCont, new ContactComp());
+  
             model.clear();
             
             for(Contact p : sortedListCont){
                 model.addElement(p);
             }
             
-            //System.out.println(model); 
-            */
+            //System.out.println("model:" + model); 
             
+            contactList.setModel(model);    
             ListCellRenderer renderer = contactList.getCellRenderer();
+            
             contactList.repaint();
             contactList.setModel(model);
             contactList.setCellRenderer(renderer);
-
-            //contactList.setCellRenderer(new TextAndIconListCellRenderer(2));
             contactList.repaint();
         }
         //System.out.println(model);
@@ -956,11 +960,28 @@ class IconListRenderer
 
 }
 
-class ContactComp implements Comparator<ArrayList<String>> {
+class ContactComp implements Comparator<Contact> {
 
-    @Override
+    /*
     public int compare(ArrayList<String> o1, ArrayList<String> o2) {
         return o1.toString().compareTo(o2.toString());
+    }
+    */
+
+    public int compare(Contact o1, Contact o2) {
+        /*
+        return o1.getStatus()- o2.getStatus();
+        */
+        
+        if(o1.getStatus() > o2.getStatus()){
+            return 1;
+        } else if (o1.getStatus() == o2.getStatus()) {
+            return o1.getUsername().compareTo(o1.getUsername());
+        }
+        else {
+            return -1;
+        }
+        
     }
 
 }

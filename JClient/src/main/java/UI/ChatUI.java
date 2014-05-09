@@ -125,9 +125,9 @@ public final class ChatUI extends JFrame implements Opcode
             File jarFile = new File(codeSource.getLocation().toURI().getPath());
             String jarDir = jarFile.getParentFile().getPath();
             File jDir = new File(jarDir);
-            //System.out.println(jarDir);
+            System.out.println(jarDir);
 
-            Runtime.getRuntime().exec("chmod 777 file");
+            ///Runtime.getRuntime().exec("chmod 777 file");
   
             String folder = "";
             String file = "";
@@ -140,18 +140,19 @@ public final class ChatUI extends JFrame implements Opcode
                 folder = to;
                 file = from;
             }
-            
             System.out.println(folder + " : " + file);
             
             File dir = new File(jarDir+"/"+folder);
             dir.mkdir();
             
+            /*
             String[] chmod = { "su", "-c","chmod 777 "+dir };
             try {
                 Runtime.getRuntime().exec(chmod);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            */
             
 
                 if (dir.exists()) {
@@ -191,7 +192,7 @@ public final class ChatUI extends JFrame implements Opcode
         fis.read(data);
         fis.close();
         //
-        String s = new String(data, "UTF-8");
+        String s = new String(data);
 
         txtOutput.append(s);
     }
