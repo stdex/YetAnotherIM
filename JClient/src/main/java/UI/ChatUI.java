@@ -7,8 +7,11 @@ import Core.NetworkManager;
 import Core.Opcode;
 import Core.Packet;
 import Core.UICore;
+import HistoryParser.ExParser;
+import HistoryParser.Message;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -24,16 +27,26 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.security.CodeSource;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 
 public final class ChatUI extends JFrame implements Opcode
 {
@@ -41,10 +54,13 @@ public final class ChatUI extends JFrame implements Opcode
     
     JScrollPane paneOutput;
     JScrollPane paneInput;
+    JEditorPane paneOutputHtml;
     
     JTextArea txtOutput;
     JTextArea txtInput;
     private JButton btnSend;
+    private HTMLEditorKit kit;
+    private Document doc;
     
     public ChatUI(Contact c)
     {
@@ -56,17 +72,27 @@ public final class ChatUI extends JFrame implements Opcode
         
         txtOutput = new JTextArea();
         txtInput = new JTextArea();
+        paneOutputHtml = new JEditorPane();
         
-        btnSend = new JButton("1");
+        btnSend = new JButton();
+        
+        Image img;
+        try {
+            img = ImageIO.read(getClass().getResource("/Images/icon_send.png"));
+            btnSend.setIcon(new ImageIcon(img));
+        } catch (IOException ex) {
+            Logger.getLogger(ChatUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         
         btnSend.setBackground(new Color(59, 89, 182));
         btnSend.setForeground(Color.WHITE);
         btnSend.setFocusPainted(false);
         btnSend.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        btnSend.setBounds(300, 315, 60, 100);
-        
-        paneOutput = new JScrollPane(txtOutput, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS ,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        btnSend.setBounds(300, 315, 60, 99);
+ 
+        paneOutput = new JScrollPane(paneOutputHtml, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS ,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         paneInput = new JScrollPane(txtInput, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED ,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         paneOutput.setBounds(10, 10, 350, 300);
@@ -76,6 +102,21 @@ public final class ChatUI extends JFrame implements Opcode
         add(paneInput);
         add(btnSend);
         
+        paneOutputHtml.setEditable(false);
+        kit = new HTMLEditorKit();
+        paneOutputHtml.setEditorKit(kit);
+        
+        // add some styles to the html
+        StyleSheet styleSheet = kit.getStyleSheet();
+        styleSheet.addRule("body {color:#000; font-family:times; margin: 4px; }");
+        styleSheet.addRule("h1 {color: blue;}");
+        styleSheet.addRule("h2 {color: #ff0000;}");
+        styleSheet.addRule(".jchat_out {background-color: #F3FAE8; width: 100%; text-align: left; font-size: 12px;  border-bottom: 1px solid #C2CEA6;}");
+        styleSheet.addRule(".jchat_in {background-color: #F8F8F8; width: 100%; text-align: left; font-size: 12px;  border-bottom: 1px solid #D4D4D4;}");
+        styleSheet.addRule("pre {font : 10px monaco; color : black; background-color : #fafafa; }");
+        styleSheet.addRule(".jchat_color_out {color : blue;}");
+        styleSheet.addRule(".jchat_color_in {color : red;}");
+
         try {
             readAllHistory(AccountDetail.getDisplayTitle(), c.getUsername());
         } catch (IOException ex) {
@@ -106,14 +147,34 @@ public final class ChatUI extends JFrame implements Opcode
     
     public void append(String from, String to, String message, String currentTime)
     {
-        message = message.replaceAll("\n", "\n     ");
-        txtOutput.append(String.format("%s:: ", currentTime));
-        txtOutput.append(String.format("%s --> ", from));
-        txtOutput.append(String.format("%s\n", to));
-        txtOutput.append(String.format("     %s\n", message));
-
-        //String outputMSG = new StringBuilder(String.format("%s:: ", currentTime)).append(String.format("%s --> ", from)).append(String.format("%s\n", to)).append(String.format("     %s\n", message)).toString();
-        //logChat(outputMSG, from, to);
+        
+        //String text = "";
+        //text = text+"<div><div class=\"jchat_color_out\">"+from+" ("+currentTime+")</div>"+message.replaceAll("(\r\n|\n)", "<br />")+"</div><br/>";
+        try {
+            readAllHistory(AccountDetail.getDisplayTitle(), c.getUsername());
+    
+        } catch (IOException ex) {
+            Logger.getLogger(ChatUI.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(ChatUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+                
+            
+            //paneOutputHtml.setText(paneOutputHtml.getText() + text);
+            
+            /*
+            try {
+            doc = paneOutputHtml.getDocument();
+            doc.insertString(doc.getLength(), text, null);
+            } catch(BadLocationException exc) {
+            exc.printStackTrace();
+            }*/
+            
+            //paneOutputHtml.getStyledDocument().insertString(text);
+            
+            //String outputMSG = new StringBuilder(String.format("%s:: ", currentTime)).append(String.format("%s --> ", from)).append(String.format("%s\n", to)).append(String.format("     %s\n", message)).toString();
+            //logChat(outputMSG, from, to);
         
     }
 
@@ -131,14 +192,17 @@ public final class ChatUI extends JFrame implements Opcode
   
             String folder = "";
             String file = "";
+            String separator = "";
             
             if(mode == "out") {
                 folder = from;
                 file = to;
+                separator = "-------------------------------------->-\n";
             }
             else {
                 folder = to;
                 file = from;
+                separator = "--------------------------------------<-\n";
             }
             System.out.println(folder + " : " + file);
             
@@ -160,6 +224,8 @@ public final class ChatUI extends JFrame implements Opcode
                     System.out.println(new File(jDir+"/"+folder+"/uhistory_" + file + ".txt"));
 
                     if (message != null && !message.equals("")) {
+                        
+                        message = message+separator;
                             
                         File bfile = new File(jDir+"/"+folder+"/uhistory_" + file + ".txt");
                         FileWriter fileWriter = new FileWriter(bfile,true);
@@ -192,9 +258,34 @@ public final class ChatUI extends JFrame implements Opcode
         fis.read(data);
         fis.close();
         //
-        String s = new String(data);
+        /*
+        URL graphicURL = null;
+        File faccept = new File(getClass().getResource("/Images/icon_accept.png").getPath());  
+        graphicURL = faccept.toURL();
+        <img src=\""+graphicURL+"\"></img>
+        */
+        
+        String sdata = new String(data);
+        
+        ExParser ep = new ExParser();
+                
+                if(ep.parse(sdata))
+                    {
+                        String text = "";
+                            // System.out.println(ep.getList());
+                        for (Message s : ep.getList()) {
+                            text = text+"<div><div class=\"jchat_color_"+s.getType()+"\">"+s.getUsername()+" ("+s.getDatetime()+")</div>"+s.getMessage().replaceAll("(\r\n|\n)", "<br />")+"</div><br/>";
+                        }
+                                
+        
+                        doc = kit.createDefaultDocument();
+                        paneOutputHtml.setDocument(doc);
+                        paneOutputHtml.setText(text);
 
-        txtOutput.append(s);
+                    }
+
+
+        //txtOutput.append(s);
     }
     
     
@@ -252,21 +343,18 @@ public final class ChatUI extends JFrame implements Opcode
                 NetworkManager.SendPacket(p);
                 
                 String message = txtInput.getText().trim();
-                message = message.replaceAll("\n", "\n     ");
                 
                 // Output the message to Chat Interface too.
                     Date dt = new java.util.Date();
-                    SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    SimpleDateFormat sdf = new java.text.SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
 
                     String nowTime = sdf.format(dt);
                 
-                
-                append(AccountDetail.getDisplayTitle(), c.getTitle().toString(), message, nowTime);
-                
-                
-                String outputMSG = new StringBuilder(String.format("%s:: ", nowTime)).append(String.format("%s --> ", AccountDetail.getDisplayTitle())).append(String.format("%s\n", c.getTitle().toString())).append(String.format("     %s\n", message)).toString();
+                String outputMSG = new StringBuilder(String.format("%s ", AccountDetail.getDisplayTitle())).append(String.format("(%s)\n", nowTime)).append(String.format("%s\n", message)).toString();
                 logChat(outputMSG, AccountDetail.getDisplayTitle(), c.getTitle().toString(), "out");
-                
+    
+                append(AccountDetail.getDisplayTitle(), c.getTitle().toString(), message, nowTime);
+            
                 // Reset the input text area.
                 txtInput.setText("");
     }

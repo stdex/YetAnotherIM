@@ -9,9 +9,11 @@ import static Core.Opcode.CMSG_SEND_CHAT_MESSAGE;
 import static Core.Opcode.СMSG_SEND_IN_SUB;
 import Core.Packet;
 import Core.UICore;
-import static UI.ChatUI.logChat;
+import HistoryParser.ExParser;
+import HistoryParser.Message;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -33,10 +35,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.text.Document;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 
 
 public final class SendSubUI extends JFrame implements Opcode
@@ -45,10 +53,15 @@ public final class SendSubUI extends JFrame implements Opcode
     
     JScrollPane paneOutput;
     JScrollPane paneInput;
+    JEditorPane paneOutputHtml;
+    
     
     JTextArea txtOutput;
     JTextArea txtInput;
     private JButton btnSend;
+    private HTMLEditorKit kit;
+    private Document doc;
+    
     
     private javax.swing.JOptionPane jOptionPane1;
     
@@ -62,16 +75,24 @@ public final class SendSubUI extends JFrame implements Opcode
         
         txtOutput = new JTextArea();
         txtInput = new JTextArea();
-            
-        btnSend = new JButton("1");
+        paneOutputHtml = new JEditorPane();
         
+       btnSend = new JButton();
+        
+        Image img;
+        try {
+            img = ImageIO.read(getClass().getResource("/Images/icon_send.png"));
+            btnSend.setIcon(new ImageIcon(img));
+        } catch (IOException ex) {
+            Logger.getLogger(ChatUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
         btnSend.setBackground(new Color(59, 89, 182));
         btnSend.setForeground(Color.WHITE);
         btnSend.setFocusPainted(false);
         btnSend.setFont(new Font("Tahoma", Font.BOLD, 12));
         
         btnSend.setBounds(300, 315, 60, 100);
-        paneOutput = new JScrollPane(txtOutput, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS ,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        paneOutput = new JScrollPane(paneOutputHtml, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS ,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         paneInput = new JScrollPane(txtInput, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED ,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         
         add(paneOutput);
@@ -85,6 +106,21 @@ public final class SendSubUI extends JFrame implements Opcode
         add(paneInput);
         add(btnSend);
         
+        paneOutputHtml.setEditable(false);
+        kit = new HTMLEditorKit();
+        paneOutputHtml.setEditorKit(kit);
+        
+        // add some styles to the html
+        StyleSheet styleSheet = kit.getStyleSheet();
+        styleSheet.addRule("body {color:#000; font-family:times; margin: 4px; }");
+        styleSheet.addRule("h1 {color: blue;}");
+        styleSheet.addRule("h2 {color: #ff0000;}");
+        styleSheet.addRule(".jchat_out {background-color: #F3FAE8; width: 100%; text-align: left; font-size: 12px;  border-bottom: 1px solid #C2CEA6;}");
+        styleSheet.addRule(".jchat_in {background-color: #F8F8F8; width: 100%; text-align: left; font-size: 12px;  border-bottom: 1px solid #D4D4D4;}");
+        styleSheet.addRule("pre {font : 10px monaco; color : black; background-color : #fafafa; }");
+        styleSheet.addRule(".jchat_color_out {color : blue;}");
+        styleSheet.addRule(".jchat_color_in {color : blue;}");
+
         
         try {
             readAllSubHistory(AccountDetail.getDisplayTitle(), c);
@@ -119,10 +155,21 @@ public final class SendSubUI extends JFrame implements Opcode
     
     public void append(String from, String message, String currentTime)
     {
+        /*
         message = message.replaceAll("\n", "\n     ");
         txtOutput.append(String.format("%s:: ", currentTime));
         txtOutput.append(String.format("%s :", from));
         txtOutput.append(String.format("     %s\n", message));
+        */
+        
+        try {
+            readAllSubHistory(AccountDetail.getDisplayTitle(), c);
+        } catch (IOException ex) {
+            Logger.getLogger(ChatUI.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(ChatUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
     
     
@@ -140,14 +187,17 @@ public final class SendSubUI extends JFrame implements Opcode
   
             String folder = "";
             String file = "";
+            String separator = "";
             
             if(mode == "out") {
-                folder = from;
+                folder = AccountDetail.getDisplayTitle();
                 file = to;
+                separator = "-------------------------------------->-\n";
             }
             else {
-                folder = to;
+                folder = AccountDetail.getDisplayTitle();
                 file = from;
+                separator = "--------------------------------------<-\n";
             }
             
             System.out.println(folder + " : " + file);
@@ -170,6 +220,8 @@ public final class SendSubUI extends JFrame implements Opcode
                     System.out.println(new File(jDir+"/"+folder+"/shistory_" + Translit.toTranslit(file) + ".txt"));
 
                     if (message != null && !message.equals("")) {
+                        
+                        message = message+separator;
                             
                         File bfile = new File(jDir+"/"+folder+"/shistory_" + Translit.toTranslit(file) + ".txt");
                         FileWriter fileWriter = new FileWriter(bfile,true);
@@ -241,6 +293,12 @@ public final class SendSubUI extends JFrame implements Opcode
     
                 String message = txtInput.getText().trim();
 
+                // Output the message to Chat Interface too.
+                Date dt = new java.util.Date();
+                SimpleDateFormat sdf = new java.text.SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
+
+                String nowTime = sdf.format(dt);
+
                 if (!message.equals(""))
                 {
                     Packet p = new Packet(СMSG_SEND_IN_SUB);
@@ -256,14 +314,8 @@ public final class SendSubUI extends JFrame implements Opcode
                 p.put(txtInput.getText().trim());
                 
                 NetworkManager.SendPacket(p);
-*/                
-               message = message.replaceAll("\n", "\n     ");
+*/ 
                 
-                // Output the message to Chat Interface too.
-               Date dt = new java.util.Date();
-               SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-               String nowTime = sdf.format(dt);
 
                // append(c.toString(), message, nowTime);
                 
@@ -290,9 +342,26 @@ public final class SendSubUI extends JFrame implements Opcode
         fis.read(data);
         fis.close();
         //
-        String s = new String(data);
+        String sdata = new String(data);
 
-        txtOutput.append(s);
+     ExParser ep = new ExParser();
+                
+                if(ep.parse(sdata))
+                    {
+                        String text = "";
+                            //System.out.println(ep.getList());
+                        for (Message s : ep.getList()) {
+                           text = text+"<div><div class=\"jchat_color_"+s.getType()+"\">"+s.getUsername()+" ("+s.getDatetime()+")</div>"+s.getMessage().replaceAll("(\r\n|\n)", "<br />")+"</div><br/>";
+                        }
+                                
+        
+                        doc = kit.createDefaultDocument();
+                        paneOutputHtml.setDocument(doc);
+                        paneOutputHtml.setText(text);
+
+                    }
+
+
     }
        
 }

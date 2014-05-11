@@ -15,10 +15,15 @@ import java.awt.event.MouseAdapter;
 import java.io.EOFException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.ListIterator;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 
@@ -238,15 +243,18 @@ public class NetworkThread implements Runnable, Opcode
         Packet p = new Packet(CMSG_GET_CHAT_MESSAGE);
         p.put(messageid);
         NetworkManager.SendPacket(p);
-        
-        Notification.NotificationPopup.showNotificationMSG(s_contact.getTitle(), AccountDetail.getTitle(), currentTime, message, s_contact);
+        try {
+            Notification.NotificationPopup.showNotificationMSG(s_contact.getTitle(), AccountDetail.getTitle(), currentTime, message, s_contact);
+        } catch (ParseException ex) {
+            Logger.getLogger(NetworkThread.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         
     }
     
     
     
-    void HandleSubscrubeMessageOpcode(Packet packet)
+    void HandleSubscrubeMessageOpcode(Packet packet) throws ParseException
     {
         int messageid = (Integer)packet.get();
         String title = (String)packet.get();
@@ -267,7 +275,12 @@ public class NetworkThread implements Runnable, Opcode
         p.put(messageid);
         NetworkManager.SendPacket(p);
         
-        String outputMSG = new StringBuilder(String.format("%s:: ", currentTime)).append(String.format("%s :: ", senderGuid)).append(String.format("     %s\n", message)).toString();
+        Date nowTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(currentTime);
+            SimpleDateFormat sdf = new java.text.SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
+            String nTime = sdf.format(nowTime);
+        
+        String outputMSG = new StringBuilder(String.format("%s ", senderGuid)).append(String.format("(%s)\n", nTime)).append(String.format("%s\n", message)).toString();
+        //String outputMSG = new StringBuilder(String.format("%s ", currentTime)).append(String.format("%s :: ", senderGuid)).append(String.format("     %s\n", message)).toString();
         logChat(outputMSG, title, senderGuid, "in");
 
         // Output the message in sender ChatUI.

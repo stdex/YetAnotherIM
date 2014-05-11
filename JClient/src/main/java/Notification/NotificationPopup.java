@@ -16,6 +16,9 @@ import java.awt.LinearGradientPaint;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -65,11 +68,11 @@ public class NotificationPopup extends JDialog {
   }
  
       
-    public static void showNotificationMSG(String from, String to, String datetime, String msg, Contact s_contact) {
+    public static void showNotificationMSG(String from, String to, String datetime, String msg, Contact s_contact) throws ParseException {
              
-        final  NotificationPopup f = new NotificationPopup();
-        final  Container c = f.getContentPane();
-          c.setLayout(new GridBagLayout());
+            final  NotificationPopup f = new NotificationPopup();
+            final  Container c = f.getContentPane();
+            c.setLayout(new GridBagLayout());
  
             final GridBagConstraints constraints = new GridBagConstraints();
             constraints.gridx = 0;
@@ -91,7 +94,10 @@ public class NotificationPopup extends JDialog {
             constraints.anchor = GridBagConstraints.NORTH;
  
             f.setVisible(true);
-            
+
+            Date nowTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(datetime);
+            SimpleDateFormat sdf = new java.text.SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
+            String nTime = sdf.format(nowTime);
                                     
                    ChatUI targetUI = UICore.getChatUIList().findUI(s_contact);
                    
@@ -102,8 +108,7 @@ public class NotificationPopup extends JDialog {
                     // Output the message in sender ChatUI.
                     targetUI.append(s_contact.getTitle(), to, msg, datetime);
                     targetUI.toFront();
-                    
-        String outputMSG = new StringBuilder(String.format("%s:: ", datetime)).append(String.format("%s --> ", s_contact.getTitle())).append(String.format("%s\n", to)).append(String.format("     %s\n", msg)).toString();
+        String outputMSG = new StringBuilder(String.format("%s ", s_contact.getTitle())).append(String.format("(%s)\n", nTime)).append(String.format("%s\n", msg)).toString();            
         logChat(outputMSG, from, to, "in");
 
             c.addMouseListener(new MouseAdapter() {  
