@@ -17,6 +17,7 @@ import static Core.Opcode.СMSG_ADD_NEW_SUBSCRIBE;
 import Core.Packet;
 import Core.UICore;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,9 +28,12 @@ import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.WindowConstants;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -202,7 +206,7 @@ public class SubscribeUI extends javax.swing.JFrame {
     
     public void populateTable() {
         
-        tableModel = new DefaultTableModel();
+    tableModel = new DefaultTableModel();
         tableModel = (DefaultTableModel) jTable1.getModel();
         tableModel.setNumRows(0);
       
@@ -214,6 +218,14 @@ public class SubscribeUI extends javax.swing.JFrame {
         }
         
         jTable1.setModel(tableModel);
+        
+        
+        for (int c = 0; c < jTable1.getColumnCount(); c++)
+        {
+            Class<?> col_class = jTable1.getColumnClass(c);
+            jTable1.setDefaultEditor(col_class, null);        // remove editor
+        }
+
     }
     
     public void tryGetSubscribeList() {

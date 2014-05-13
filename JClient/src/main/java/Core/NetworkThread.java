@@ -10,10 +10,13 @@ import UI.RoomFormUI;
 import UI.SendSubUI;
 import static UI.SendSubUI.logChat;
 import UI.SubscribeUI;
+import static UI.SubscribeUI.jTable1;
+import static UI.SubscribeUI.tableModel;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
-
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -29,12 +32,16 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 public class NetworkThread implements Runnable, Opcode
@@ -313,7 +320,7 @@ public class NetworkThread implements Runnable, Opcode
         //targetUI.toFront();
     }
     
-    void HandleGetSubscribeListOpcode(Packet packet)
+    void HandleGetSubscribeListOpcode(Packet packet) throws IOException
     {
         titles = (ArrayList<SubTable>)packet.get();
                 
@@ -321,14 +328,45 @@ public class NetworkThread implements Runnable, Opcode
         tableModel = (DefaultTableModel) UI.SubscribeUI.jTable1.getModel();
         tableModel.setNumRows(0);
       
+/*
+        BufferedImage originalImage1;
+        BufferedImage originalImage2;
+        originalImage1 = ImageIO.read(this.getClass().getResource("/Images/icon_accept.png"));
+        originalImage2 = ImageIO.read(this.getClass().getResource("/Images/icon_exit.png"));
+        ByteArrayOutputStream baos1=new ByteArrayOutputStream();
+        ByteArrayOutputStream baos2=new ByteArrayOutputStream();
+        ImageIO.write(originalImage1, "png", baos1);
+        ImageIO.write(originalImage1, "png", baos2);
+        byte[] imageInByte1=baos1.toByteArray();
+        byte[] imageInByte2=baos2.toByteArray();
+        byte[] imageInByte;
+        
+                    
+        System.out.println(titles.get(count).getStatus());
+            
+            if(titles.get(count).getStatus() == "1") {
+                imageInByte = imageInByte1;
+            }
+            else
+            {
+                imageInByte = imageInByte2;
+            }
+            */
+        
         for (int count = 0; count < titles.size(); count++){
+
+            
             tableModel.addRow(new Object[]{1});
             tableModel.setValueAt(titles.get(count).getTitle(), count, 0);
             tableModel.setValueAt(titles.get(count).getStatus(), count, 1);
             tableModel.setValueAt("-->", count, 2);
+            
         }
         
         UI.SubscribeUI.jTable1.setModel(tableModel);
+        
+        
+   //     jTable1.getColumnModel().getColumn(1).setCellRenderer(new ImageRenderer());
         
     }
   
@@ -352,7 +390,7 @@ public class NetworkThread implements Runnable, Opcode
         
     }
 
-    void HandleUnSubscribeSuccessOpcode(Packet packet)
+    void HandleUnSubscribeSuccessOpcode(Packet packet) throws IOException
     {
         Packet p = new Packet(CMSG_GET_SUBLIST);
         NetworkManager.SendPacket(p);    
@@ -361,7 +399,32 @@ public class NetworkThread implements Runnable, Opcode
         tableModel = (DefaultTableModel) UI.SubscribeUI.jTable1.getModel();
         tableModel.setNumRows(0);
       
+
+        /*
+        BufferedImage originalImage1;
+        BufferedImage originalImage2;
+        originalImage1 = ImageIO.read(this.getClass().getResource("/Images/icon_accept.png"));
+        originalImage2 = ImageIO.read(this.getClass().getResource("/Images/icon_exit.png"));
+        ByteArrayOutputStream baos1=new ByteArrayOutputStream();
+        ByteArrayOutputStream baos2=new ByteArrayOutputStream();
+        ImageIO.write(originalImage1, "png", baos1);
+        ImageIO.write(originalImage1, "png", baos2);
+        byte[] imageInByte1=baos1.toByteArray();
+        byte[] imageInByte2=baos2.toByteArray();
+        byte[] imageInByte = null;
+        
+                    
+            if(titles.get(count).getStatus() == "1") {
+                imageInByte = imageInByte1;
+            }
+            else
+            {
+                imageInByte = imageInByte2;
+            }
+        */
+        
         for (int count = 0; count < titles.size(); count++){
+
             tableModel.addRow(new Object[]{1});
             tableModel.setValueAt(titles.get(count).getTitle(), count, 0);
             tableModel.setValueAt(titles.get(count).getStatus(), count, 1);
@@ -539,3 +602,23 @@ public class NetworkThread implements Runnable, Opcode
         }
     }
 }
+
+/*
+class ImageRenderer extends DefaultTableCellRenderer
+{
+ 
+    @Override
+    public Component getTableCellRendererComponent(JTable table,Object value, boolean isSelected,boolean hasFocus, int row, int column)
+    {
+        JLabel label = new JLabel();
+ 
+        if (value!=null) {
+        label.setHorizontalAlignment(JLabel.CENTER);
+        //value is parameter which filled by byteOfImage
+        label.setIcon(new ImageIcon((byte[])value));
+        }
+ 
+        return label;
+    }
+}
+*/

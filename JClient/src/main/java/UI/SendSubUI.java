@@ -16,7 +16,6 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -38,6 +37,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -97,7 +97,6 @@ public final class SendSubUI extends JFrame implements Opcode
         
         add(paneOutput);
         add(paneInput);
-        
 
         paneOutput.setBounds(10, 10, 350, 300);
         paneInput.setBounds(10, 315, 290, 100);
@@ -105,6 +104,14 @@ public final class SendSubUI extends JFrame implements Opcode
         add(paneOutput);
         add(paneInput);
         add(btnSend);
+
+        
+        String[] priorityStrings = { "Обычное", "Важное" };
+
+        //Create the combo box, select item at index 4.
+        //Indices start at 0, so 4 specifies the pig.
+        JComboBox priorityList = new JComboBox(priorityStrings);
+        priorityList.setSelectedIndex(0);
         
         paneOutputHtml.setEditable(false);
         kit = new HTMLEditorKit();
