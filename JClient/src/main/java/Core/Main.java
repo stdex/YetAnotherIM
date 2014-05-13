@@ -8,4 +8,5 @@ public class Main
         //UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         UICore.initiate();
     }
+    
 }

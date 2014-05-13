@@ -6,6 +6,7 @@
 
 package UI;
 
+import Core.Contact;
 import Core.NetworkManager;
 import static Core.NetworkThread.titles;
 import Core.Opcode;
@@ -45,6 +46,7 @@ public class SubscribeUI extends javax.swing.JFrame {
     public Integer selectedColumn;
     public int[] selectedRows;
     public static SendSubUI ui;
+    public static DefaultTableModel tableModel;
     
     /**
      * Creates new form SubscribeUI
@@ -200,7 +202,7 @@ public class SubscribeUI extends javax.swing.JFrame {
     
     public void populateTable() {
         
-        DefaultTableModel tableModel = new DefaultTableModel();
+        tableModel = new DefaultTableModel();
         tableModel = (DefaultTableModel) jTable1.getModel();
         tableModel.setNumRows(0);
       
@@ -281,7 +283,17 @@ public class SubscribeUI extends javax.swing.JFrame {
         }
 
     }
+    /*
+   public Contact searchSubscribe(int guid)
+    {
 
+        for (int i = 0; i < tableModel.getSize(); i++)
+            if (((Contact)tableModel.elementAt(i)).getGuid() == guid)
+                return (Contact)model.elementAt(i);
+        
+        return null;
+    }
+*/
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

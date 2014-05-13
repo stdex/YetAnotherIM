@@ -95,30 +95,7 @@ public class NotificationPopup extends JDialog {
  
             f.setVisible(true);
 
-            Date nowTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(datetime);
-            SimpleDateFormat sdf = new java.text.SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
-            String nTime = sdf.format(nowTime);
-                                    
-                   ChatUI targetUI = UICore.getChatUIList().findUI(s_contact);
-                   
-        
-                    if (targetUI == null)
-                        UICore.getChatUIList().add(targetUI = new ChatUI(s_contact));
-                    
-                    // Output the message in sender ChatUI.
-                    targetUI.append(s_contact.getTitle(), to, msg, datetime);
-                    targetUI.toFront();
-        String outputMSG = new StringBuilder(String.format("%s ", s_contact.getTitle())).append(String.format("(%s)\n", nTime)).append(String.format("%s\n", msg)).toString();            
-        logChat(outputMSG, from, to, "in");
-
-            c.addMouseListener(new MouseAdapter() {  
-                      public void mousePressed(MouseEvent me){  
-                 
-                          //
-                          //System.out.println("Remove this label");  
-
-                          }  
-                  });  
+ 
         
             new Thread(){ 
                     @Override

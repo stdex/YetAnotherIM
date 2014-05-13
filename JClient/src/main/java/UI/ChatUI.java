@@ -118,7 +118,7 @@ public final class ChatUI extends JFrame implements Opcode
         styleSheet.addRule(".jchat_color_in {color : red;}");
 
         try {
-            readAllHistory(AccountDetail.getDisplayTitle(), c.getUsername());
+            readAllHistory(AccountDetail.getUsername(), c.getUsername());
         } catch (IOException ex) {
             Logger.getLogger(ChatUI.class.getName()).log(Level.SEVERE, null, ex);
         } catch (URISyntaxException ex) {
@@ -147,11 +147,10 @@ public final class ChatUI extends JFrame implements Opcode
     
     public void append(String from, String to, String message, String currentTime)
     {
-        
         //String text = "";
         //text = text+"<div><div class=\"jchat_color_out\">"+from+" ("+currentTime+")</div>"+message.replaceAll("(\r\n|\n)", "<br />")+"</div><br/>";
         try {
-            readAllHistory(AccountDetail.getDisplayTitle(), c.getUsername());
+            readAllHistory(AccountDetail.getUsername(), c.getUsername());
     
         } catch (IOException ex) {
             Logger.getLogger(ChatUI.class.getName()).log(Level.SEVERE, null, ex);
@@ -319,7 +318,9 @@ public final class ChatUI extends JFrame implements Opcode
                     return;
                 }
                 
-                SendMSG();
+                txtInput.append("\n");
+                return;
+                //SendMSG();
 
             }
         }   
@@ -350,10 +351,10 @@ public final class ChatUI extends JFrame implements Opcode
 
                     String nowTime = sdf.format(dt);
                 
-                String outputMSG = new StringBuilder(String.format("%s ", AccountDetail.getDisplayTitle())).append(String.format("(%s)\n", nowTime)).append(String.format("%s\n", message)).toString();
-                logChat(outputMSG, AccountDetail.getDisplayTitle(), c.getTitle().toString(), "out");
+                String outputMSG = new StringBuilder(String.format("%s ", AccountDetail.getUsername())).append(String.format("(%s)\n", nowTime)).append(String.format("%s\n", message)).toString();
+                logChat(outputMSG, AccountDetail.getUsername(), c.getUsername().toString(), "out");
     
-                append(AccountDetail.getDisplayTitle(), c.getTitle().toString(), message, nowTime);
+                append(AccountDetail.getUsername(), c.getUsername().toString(), message, nowTime);
             
                 // Reset the input text area.
                 txtInput.setText("");

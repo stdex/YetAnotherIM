@@ -53,14 +53,14 @@ public final class SendSubUI extends JFrame implements Opcode
     
     JScrollPane paneOutput;
     JScrollPane paneInput;
-    JEditorPane paneOutputHtml;
+    private static JEditorPane paneOutputHtml;
     
     
     JTextArea txtOutput;
     JTextArea txtInput;
     private JButton btnSend;
-    private HTMLEditorKit kit;
-    private Document doc;
+    private static HTMLEditorKit kit;
+    private static Document doc;
     
     
     private javax.swing.JOptionPane jOptionPane1;
@@ -123,7 +123,7 @@ public final class SendSubUI extends JFrame implements Opcode
 
         
         try {
-            readAllSubHistory(AccountDetail.getDisplayTitle(), c);
+            readAllSubHistory(AccountDetail.getUsername(), c);
         } catch (IOException ex) {
             Logger.getLogger(ChatUI.class.getName()).log(Level.SEVERE, null, ex);
         } catch (URISyntaxException ex) {
@@ -144,7 +144,7 @@ public final class SendSubUI extends JFrame implements Opcode
         
         
             
-         btnSend.addActionListener(new ActionListener() {  
+        btnSend.addActionListener(new ActionListener() {  
             public void actionPerformed(ActionEvent arg0)   
             {  
                 SendMSG();
@@ -190,12 +190,12 @@ public final class SendSubUI extends JFrame implements Opcode
             String separator = "";
             
             if(mode == "out") {
-                folder = AccountDetail.getDisplayTitle();
+                folder = AccountDetail.getUsername();
                 file = to;
                 separator = "-------------------------------------->-\n";
             }
             else {
-                folder = AccountDetail.getDisplayTitle();
+                folder = AccountDetail.getUsername();
                 file = from;
                 separator = "--------------------------------------<-\n";
             }
@@ -263,11 +263,12 @@ public final class SendSubUI extends JFrame implements Opcode
                 // Shift + Enter = next line.
                 if (e.isShiftDown())
                 {
-                    txtInput.append("\n");
-                    return;
+                    
                 }
                 
-                SendMSG();
+                txtInput.append("\n");
+                return;
+                //SendMSG();
 
             }
         }   
@@ -325,7 +326,7 @@ public final class SendSubUI extends JFrame implements Opcode
     }
     
         
-    public void readAllSubHistory(String from, String to) throws FileNotFoundException, IOException, URISyntaxException {
+    public static void readAllSubHistory(String from, String to) throws FileNotFoundException, IOException, URISyntaxException {
 
         
         CodeSource codeSource = Main.class.getProtectionDomain().getCodeSource();
@@ -344,7 +345,7 @@ public final class SendSubUI extends JFrame implements Opcode
         //
         String sdata = new String(data);
 
-     ExParser ep = new ExParser();
+        ExParser ep = new ExParser();
                 
                 if(ep.parse(sdata))
                     {

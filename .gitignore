@@ -13,3 +13,4 @@ hs_err_pid*
 /JServer/target/
 /JClient/target/
 /JClient/targettest1/
+/JAdapter/target/

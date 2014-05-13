@@ -5,6 +5,7 @@ CREATE TABLE account (
   title character varying(200) DEFAULT NULL,
   psm character varying(200) DEFAULT NULL,
   online int DEFAULT '0',
+  adapter int DEFAULT '0',
   CONSTRAINT account_pkey PRIMARY KEY (guid)
 )
 WITH (

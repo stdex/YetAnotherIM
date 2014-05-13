@@ -467,7 +467,7 @@ public class Session implements Runnable, Opcode
     
     void HandleGetOfflineMsgOpcode(Packet packet) throws Exception
     {
-         System.out.printf("Send offline messages if it is:\n");
+         System.out.printf("Send offline messages:\n");
          ResultSet rs = Main.db.query("SELECT * FROM messages WHERE r_guid='%d' AND fcg='%d'", c.getGuid(), 0);
          
          while(rs.next()) {
@@ -494,6 +494,39 @@ public class Session implements Runnable, Opcode
              
          }
  
+         System.out.printf("Send offline subscribe messages:\n");
+         ResultSet srs = Main.db.query("SELECT * FROM subscribe_messages WHERE r_guid='%d' AND fcg='%d'", c.getGuid(), 0);
+         
+         while(srs.next()) {
+             
+            Client target = Main.clientList.findClient(c.getGuid());
+
+            int subsID = srs.getInt("sid");
+            ResultSet rsb = null;
+            
+            if (target != null)
+                   {
+                    rsb = Main.db.query("SELECT * FROM subscribe WHERE sid='%d'", subsID);
+                            if (rsb.first()) {
+                                Packet p = new Packet(SMSG_SEND_IN_SUB);
+                                p.put(srs.getInt("id"));
+                                p.put(rsb.getString("title"));
+                                p.put(target.getUsername());
+                                //p.put(c.getGuid());
+                                p.put(c.getUsername());
+                                p.put(srs.getString("message"));
+                                p.put(srs.getString("datetime"));
+
+                                target.getSession().SendPacket(p);
+
+                                System.out.printf("Send message success\n");
+                            }
+                  }
+             else
+                      System.out.printf("Send Chat Message Cancel: Client %d is currently offline.\n", c.getGuid());
+             
+         }
+         
     }
     
     void HandleSendInSubOpcode(Packet packet) throws Exception
@@ -551,10 +584,11 @@ public class Session implements Runnable, Opcode
                 
                 if (target != null)
                 {
+
                     Packet p = new Packet(SMSG_SEND_IN_SUB);
                     p.put(idmsg);
                     p.put(title);
-                    p.put(rs.getInt("guid"));
+                    p.put(target.getUsername());
                     //p.put(c.getGuid());
                     p.put(c.getUsername());
                     p.put(msg);

@@ -102,7 +102,7 @@ public class NetworkManager implements Opcode
         NetworkThread.stop();
         destroy();
         
-        System.out.println("LOGOUT: SUCCESS");
+        System.out.println("Logout: SUCCESS");
     }
     
     public static void getContactList()

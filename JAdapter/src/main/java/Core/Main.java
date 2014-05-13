@@ -10,7 +10,7 @@ public class Main
     public static void main(String[] args) throws Exception
     {
 
-        
+        /*
         if(args.length < 4) {
         return;
         }
@@ -24,13 +24,13 @@ public class Main
         password = args[1];
         subsName = args[2];
         subsMessage = args[3];
-       
-        /*
+        */
+        
         login = "test2";
         password = "test2";
-        subsName = "for_test";
+        subsName = "Тестовая";
         subsMessage = "Message123!";
-         */
+        
         
         NetworkManager.login(login, password, 0);
     }

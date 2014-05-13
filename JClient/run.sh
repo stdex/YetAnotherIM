@@ -1,2 +1,2 @@
 #bash
-java -cp YetIM_Client.jar Core.Main
+java -cp JClient-1.0-SNAPSHOT-jar-with-dependencies.jar Core.Main

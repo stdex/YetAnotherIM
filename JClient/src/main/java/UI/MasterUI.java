@@ -146,6 +146,18 @@ public class MasterUI extends JFrame implements Opcode
         menuBar = new JMenuBar();
         //menuBar.add(roomMenu);
         
+        BufferedImage wPic;
+        try {
+            wPic = ImageIO.read(this.getClass().getResource("/Images/icon_main.png"));
+            JLabel wIcon = new JLabel(new ImageIcon(wPic));
+            loginPanel.add(wIcon);
+            wIcon.setBounds(45, 50, 180, 120);
+        } catch (IOException ex) {
+            Logger.getLogger(MasterUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        
+        /*
         BufferedImage myPicture;
         try {
             //System.out.println(getClass().getResource("/Images/icon_main.png").getPath());
@@ -156,6 +168,7 @@ public class MasterUI extends JFrame implements Opcode
         } catch (IOException ex) {
             Logger.getLogger(MasterUI.class.getName()).log(Level.SEVERE, null, ex);
         }
+        */
   
         /* Login UI */
         lblUsername = new JLabel("Логин");
@@ -312,6 +325,25 @@ public class MasterUI extends JFrame implements Opcode
             }  
         });
 
+        /*
+        http://skype2gmail.blogspot.ru/2011/05/java-tray-icon-transparency.html
+        
+        <groupId>com.github.taksan</groupId>
+        <artifactId>native-tray-adapter</artifactId>
+        <version>1.1</version>
+        
+        https://github.com/taksan/native-tray-adapter
+        
+        SystemTrayAdapter trayAdapter = SystemTrayProvider.getSystemTray();  
+        URL imageUrl = getClass().getResource("myImage.svg");  
+        String tooltip = "I'm transparent under linux!";   
+        PopupMenu popup = produceMyPopupMenu();  
+        TrayIconAdapter trayIconAdapter = trayAdapter.createAndAddTrayIcon(  
+           imageUrl,   
+           tooltip,  
+           popup); 
+        */
+
             URL resource = getClass().getResource("/Images/icon_tray.png");
             Image image = Toolkit.getDefaultToolkit().getImage(resource);
             //Image image = Toolkit.getDefaultToolkit().createImage("/Resource/Images/icon_tray.png");
@@ -375,7 +407,6 @@ public class MasterUI extends JFrame implements Opcode
 		cbStatus.setRenderer(new IconListRenderer(icons));
         
     }
-
     
     public void setAccountDetail(int guid, String username, String title, String psm, int status)
     {
@@ -428,6 +459,7 @@ public class MasterUI extends JFrame implements Opcode
             c.setStatus(status);
             
             //TODO: sort contact list 
+            /*
             ArrayList<Contact> sortedListCont = new ArrayList<Contact>();
             
             //System.out.println("sortedListCont:" + sortedListCont);
@@ -448,6 +480,8 @@ public class MasterUI extends JFrame implements Opcode
             //System.out.println("model:" + model); 
             
             contactList.setModel(model);    
+            */
+            
             ListCellRenderer renderer = contactList.getCellRenderer();
             
             contactList.repaint();

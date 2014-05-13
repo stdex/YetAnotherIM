@@ -1,6 +1,8 @@
 package Core;
 
+import Notification.NotificationWindow;
 import UI.ChatUI;
+import static UI.ChatUI.logChat;
 import UI.ContactRequestUI;
 import UI.MasterUI;
 import UI.RoomChatUI;
@@ -13,8 +15,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 
 import java.io.EOFException;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -200,7 +205,7 @@ public class NetworkThread implements Runnable, Opcode
         UICore.showMessageDialog("Пользователь не найден.", "Добавление нового контакта", JOptionPane.INFORMATION_MESSAGE);
     }
     
-    void HandleChatMessageOpcode(Packet packet)
+    void HandleChatMessageOpcode(Packet packet) throws ParseException
     {
 
         int messageid = (Integer)packet.get();
@@ -243,33 +248,47 @@ public class NetworkThread implements Runnable, Opcode
         Packet p = new Packet(CMSG_GET_CHAT_MESSAGE);
         p.put(messageid);
         NetworkManager.SendPacket(p);
+        
+        /*
+        NotificationWindow theWindow1 = new NotificationWindow(
+                                s_contact.getTitle(),
+                                message,
+                                2000);
+        */
+        
+        
+            Date nowTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(currentTime);
+            SimpleDateFormat sdf = new java.text.SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
+            String nTime = sdf.format(nowTime);
+            
+            String outputMSG = new StringBuilder(String.format("%s ", s_contact.getUsername())).append(String.format("(%s)\n", nTime)).append(String.format("%s\n", message)).toString();            
+            ChatUI.logChat(outputMSG, s_contact.getUsername(), AccountDetail.getUsername(), "in");
+        
+        new NotificationWindow(s_contact.getUsername(), message, 4000, "chat", s_contact, "");
+        /*
         try {
-            Notification.NotificationPopup.showNotificationMSG(s_contact.getTitle(), AccountDetail.getTitle(), currentTime, message, s_contact);
+            Notification.NotificationPopup.showNotificationMSG(s_contact.getTitle(), AccountDetail.getTitle(), currentTime, , s_contact);
         } catch (ParseException ex) {
             Logger.getLogger(NetworkThread.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
 
         
     }
     
     
     
-    void HandleSubscrubeMessageOpcode(Packet packet) throws ParseException
+    void HandleSubscrubeMessageOpcode(Packet packet) throws ParseException, IOException, FileNotFoundException, URISyntaxException
     {
         int messageid = (Integer)packet.get();
         String title = (String)packet.get();
-        int reciverGuid = (Integer)packet.get();
+        String reciverGuid = (String)packet.get();
         String senderGuid = (String)packet.get();
         String message = (String)packet.get();
         String currentTime = (String)packet.get();
         
         System.out.println(currentTime + "::" + messageid + ":: " + senderGuid + " --> " + reciverGuid + ":: " + message);
-        
-        SendSubUI targetUI = UICore.getSubsUIList().findUI(title);
-        
-        if (targetUI == null)
-            UICore.getSubsUIList().add(targetUI = new SendSubUI(title));
-    
+
+
         // Send approve message to server
         Packet p = new Packet(CMSG_GET_IN_SUB);
         p.put(messageid);
@@ -281,12 +300,17 @@ public class NetworkThread implements Runnable, Opcode
         
         String outputMSG = new StringBuilder(String.format("%s ", senderGuid)).append(String.format("(%s)\n", nTime)).append(String.format("%s\n", message)).toString();
         //String outputMSG = new StringBuilder(String.format("%s ", currentTime)).append(String.format("%s :: ", senderGuid)).append(String.format("     %s\n", message)).toString();
-        logChat(outputMSG, title, senderGuid, "in");
+        SendSubUI.logChat(outputMSG, title, senderGuid, "in");
+        
+        Contact s_contact = null;
 
+        new NotificationWindow(senderGuid, message, 4000, "subscribe", s_contact, title);
+        
+        SendSubUI.readAllSubHistory(reciverGuid,title);
         // Output the message in sender ChatUI.
         //targetUI.append(Integer.toString(senderGuid), message, currentTime);
-        targetUI.append(senderGuid, message, currentTime);
-        targetUI.toFront();
+        //targetUI.append(senderGuid, message, currentTime);
+        //targetUI.toFront();
     }
     
     void HandleGetSubscribeListOpcode(Packet packet)

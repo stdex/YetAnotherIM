@@ -1,0 +1,2 @@
+#bash
+mvn assembly:assembly
