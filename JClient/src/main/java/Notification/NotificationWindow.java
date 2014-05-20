@@ -35,15 +35,12 @@ import javax.swing.WindowConstants;
 public class NotificationWindow extends javax.swing.JDialog implements TimedEventCallback {
 	
 	// this code is static to manage the number of windows that are open
-	protected static int numOpen;
+	private static int numOpen;
 	
-	protected static int getOpen() { return numOpen; }
-	protected static void windowOpen() { numOpen++; }
-	protected static void windowClose() { numOpen--; }
-	
-	
-	
-	
+	private static int getOpen() { return numOpen; }
+	private static void windowOpen() { numOpen++; }
+	private static void windowClose() { numOpen--; }
+
 	private static final long serialVersionUID = 1L;
 	private JPanel jPanel1;
 	private JLabel jlSubject;
@@ -72,15 +69,13 @@ public class NotificationWindow extends javax.swing.JDialog implements TimedEven
 		NotificationWindow.windowOpen();
 
 		this.setVisible(true);
-                //
-                
-                
 
+                
             this.addMouseListener(new MouseAdapter() {  
-                      public void mousePressed(MouseEvent me){                   
-                          System.out.println("Click!");
+                      public void mouseClicked(MouseEvent me){                   
               
                    if(mode == "chat") {
+                        TrayUtil.disposeMsgTray(s_contact, "");
                         ChatUI targetUI = UICore.getChatUIList().findUI(s_contact);
 
                         if (targetUI == null)
@@ -91,14 +86,22 @@ public class NotificationWindow extends javax.swing.JDialog implements TimedEven
                     targetUI.toFront();
                    }
                    else if (mode == "subscribe") {
+                        TrayUtil.disposeMsgTray(null, titlef);
                         SendSubUI targetUI = UICore.getSubsUIList().findUI(titlef);
+                        
+                        //System.out.println(mode+" :: "+" :: "+titlef+" :: "+targetUI);
         
                         if (targetUI == null)
                             UICore.getSubsUIList().add(targetUI = new SendSubUI(titlef));
                         
+                        
                         targetUI.toFront();
                    }
-                          
+                   
+                   // TODO: dispose window if click
+                    //timeUp();
+                    //setVisible(false);
+                    //numOpen--;
 
                           }
                   }); 

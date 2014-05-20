@@ -1,6 +1,7 @@
 package Core;
 
 import Notification.NotificationWindow;
+import Notification.TrayUtil;
 import UI.ChatUI;
 import static UI.ChatUI.logChat;
 import UI.ContactRequestUI;
@@ -272,6 +273,9 @@ public class NetworkThread implements Runnable, Opcode
             ChatUI.logChat(outputMSG, s_contact.getUsername(), AccountDetail.getUsername(), "in");
         
         new NotificationWindow(s_contact.getUsername(), message, 4000, "chat", s_contact, "");
+
+        new TrayUtil("chat", s_contact, "");
+        //TrayUtil.createTray();
         /*
         try {
             Notification.NotificationPopup.showNotificationMSG(s_contact.getTitle(), AccountDetail.getTitle(), currentTime, , s_contact);
@@ -310,9 +314,17 @@ public class NetworkThread implements Runnable, Opcode
         SendSubUI.logChat(outputMSG, title, senderGuid, "in");
         
         Contact s_contact = null;
+        SendSubUI targetUI = UICore.getSubsUIList().findUI(title);
 
+        if( !reciverGuid.equals(senderGuid) ) {
+            // TODO: check if windws is focused
+            //if( !(targetUI.isFocusableWindow()) )
+        new TrayUtil("subscribe", s_contact, title);
         new NotificationWindow(senderGuid, message, 4000, "subscribe", s_contact, title);
+        }
         
+        
+                
         SendSubUI.readAllSubHistory(reciverGuid,title);
         // Output the message in sender ChatUI.
         //targetUI.append(Integer.toString(senderGuid), message, currentTime);
@@ -582,7 +594,9 @@ public class NetworkThread implements Runnable, Opcode
     void HandleLogoutCompleteOpcode(Packet packet)
     {
         NetworkManager.logout();
+        TrayUtil.disposeAllMsgTray();
     }
+    
     
     class PeriodicTimeSyncResp extends TimerTask 
     {

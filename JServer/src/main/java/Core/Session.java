@@ -495,7 +495,8 @@ public class Session implements Runnable, Opcode
          }
  
          System.out.printf("Send offline subscribe messages:\n");
-         ResultSet srs = Main.db.query("SELECT * FROM subscribe_messages WHERE r_guid='%d' AND fcg='%d'", c.getGuid(), 0);
+         //SELECT * FROM subscribe_messages LEFT JOIN account ON subscribe_messages.o_guid = account.guid WHERE r_guid='3' AND fcg='0'
+         ResultSet srs = Main.db.query("SELECT * FROM subscribe_messages LEFT JOIN account ON subscribe_messages.o_guid = account.guid WHERE r_guid='%d' AND fcg='%d'", c.getGuid(), 0);
          
          while(srs.next()) {
              
@@ -513,7 +514,8 @@ public class Session implements Runnable, Opcode
                                 p.put(rsb.getString("title"));
                                 p.put(target.getUsername());
                                 //p.put(c.getGuid());
-                                p.put(c.getUsername());
+                                //p.put(c.getUsername());
+                                p.put(srs.getString("username"));
                                 p.put(srs.getString("message"));
                                 p.put(srs.getString("datetime"));
 

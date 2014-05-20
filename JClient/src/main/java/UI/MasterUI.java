@@ -632,7 +632,7 @@ public class MasterUI extends JFrame implements Opcode
                     
                     NetworkManager.SendPacket(p);
                 }
-                else
+                else 
                     NetworkManager.SendPacket(new Packet(CMSG_LOGOUT));
             }
         }
