@@ -213,7 +213,7 @@ public class NetworkThread implements Runnable, Opcode
         UICore.showMessageDialog("Пользователь не найден.", "Добавление нового контакта", JOptionPane.INFORMATION_MESSAGE);
     }
     
-    void HandleChatMessageOpcode(Packet packet) throws ParseException
+    void HandleChatMessageOpcode(Packet packet) throws ParseException, IOException, FileNotFoundException, URISyntaxException
     {
 
         int messageid = (Integer)packet.get();
@@ -272,9 +272,9 @@ public class NetworkThread implements Runnable, Opcode
             String outputMSG = new StringBuilder(String.format("%s ", s_contact.getUsername())).append(String.format("(%s)\n", nTime)).append(String.format("%s\n", message)).toString();            
             ChatUI.logChat(outputMSG, s_contact.getUsername(), AccountDetail.getUsername(), "in");
         
-        new NotificationWindow(s_contact.getUsername(), message, 4000, "chat", s_contact, "");
-
+        new NotificationWindow(s_contact.getUsername()+" ("+nTime+")", message, 4000, "chat", s_contact, "");
         new TrayUtil("chat", s_contact, "");
+        ChatUI.readAllHistory(AccountDetail.getUsername(), s_contact.getUsername());
         //TrayUtil.createTray();
         /*
         try {
@@ -320,7 +320,7 @@ public class NetworkThread implements Runnable, Opcode
             // TODO: check if windws is focused
             //if( !(targetUI.isFocusableWindow()) )
         new TrayUtil("subscribe", s_contact, title);
-        new NotificationWindow(senderGuid, message, 4000, "subscribe", s_contact, title);
+        new NotificationWindow(senderGuid+" ("+nTime+")", message, 4000, "subscribe", s_contact, title);
         }
         
         

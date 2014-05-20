@@ -54,13 +54,13 @@ public final class ChatUI extends JFrame implements Opcode
     
     JScrollPane paneOutput;
     JScrollPane paneInput;
-    JEditorPane paneOutputHtml;
+    private static JEditorPane paneOutputHtml;
     
     JTextArea txtOutput;
     JTextArea txtInput;
     private JButton btnSend;
-    private HTMLEditorKit kit;
-    private Document doc;
+    private static HTMLEditorKit kit;
+    private static Document doc;
     
     public ChatUI(Contact c)
     {
@@ -241,7 +241,7 @@ public final class ChatUI extends JFrame implements Opcode
         }
     }
     
-    public void readAllHistory(String from, String to) throws FileNotFoundException, IOException, URISyntaxException {
+    public static void readAllHistory(String from, String to) throws FileNotFoundException, IOException, URISyntaxException {
 
         CodeSource codeSource = Main.class.getProtectionDomain().getCodeSource();
 
@@ -314,11 +314,11 @@ public final class ChatUI extends JFrame implements Opcode
                 // Shift + Enter = next line.
                 if (e.isShiftDown())
                 {
-                    txtInput.append("\n");
+                    //txtInput.append("\n");
                     return;
                 }
                 
-                txtInput.append("\n");
+                //txtInput.append("\n");
                 return;
                 //SendMSG();
 

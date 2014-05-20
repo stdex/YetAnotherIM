@@ -8,15 +8,20 @@ import UI.SendSubUI;
 import java.awt.AWTException;
 import java.awt.Image;
 import java.awt.SystemTray;
+import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.Timer;
@@ -36,9 +41,9 @@ public class TrayUtil {
     public static HashSet<SystemTray> lTray = new HashSet<SystemTray>();
     
     public TrayUtil(String mode, Contact s_contact, String titlef) {
-
+        
         if(mode == "chat") {
-            if(!listContacts.contains(s_contact)) {
+            if(!listContacts.contains(s_contact)) { 
                 createTray(mode, s_contact, titlef);
             }
             listContacts.add(s_contact);
@@ -49,16 +54,25 @@ public class TrayUtil {
             }
             listContacts.add(titlef);
         }
+        
+        
 
     }
 
     public void createTray(final String mode, final Contact s_contact, final String titlef) {
-    
+  
+      
     final Image nullImage = new ImageIcon("").getImage();
-    final Image defalutImage = new ImageIcon(Core.Main.class.getResource("/Images/icon_msg.png")).getImage();
+    /*
+    final Image defalutImage = new ImageIcon(this.getClass().getResource("/Images/icon_msg.png")).getImage();
+    */
+    URL resource = getClass().getResource("/Images/icon_msg.png");
+    System.out.println(resource.toString());
+    final Image defalutImage = Toolkit.getDefaultToolkit().getImage(resource);
+    //System.out.println(defalutImage);  
     final TrayIcon trayIcon = new TrayIcon(defalutImage, "");
     final Object idTray = (s_contact != null)?s_contact:titlef;
-          System.out.println(idTray.toString());      
+                
         Timer timer = null;
         if (SystemTray.isSupported()) {
             try {

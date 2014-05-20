@@ -1,3 +1,6 @@
+CREATE DATABASE yetAIM;
+
+
 CREATE TABLE account (
   guid SERIAL NOT NULL,
   username character varying(50) NOT NULL,
@@ -11,6 +14,7 @@ CREATE TABLE account (
 WITH (
   OIDS=FALSE
 );
+
 
 CREATE TABLE contact (
   id SERIAL NOT NULL,
@@ -57,6 +61,7 @@ CREATE TABLE subscribe (
 WITH (
   OIDS=FALSE
 );
+
 
 CREATE TABLE subscribe_account (
   id SERIAL NOT NULL,

@@ -6,6 +6,7 @@ import UI.ChatUI;
 import UI.SendSubUI;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -132,10 +133,12 @@ public class NotificationWindow extends javax.swing.JDialog implements TimedEven
 				{
 					jlSubject = new JLabel();
 					jlSubject.setText("Subject");
+                                        jlSubject.setForeground(Color.red);
 				}
 				{
 					jlMessage = new JLabel();
 					jlMessage.setText("Message");
+                                        jlMessage.setForeground(Color.blue);
 				}
 				jPanel1Layout.setHorizontalGroup(jPanel1Layout.createSequentialGroup()
 					.addContainerGap()

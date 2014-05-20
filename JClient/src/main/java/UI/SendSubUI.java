@@ -269,11 +269,10 @@ public final class SendSubUI extends JFrame implements Opcode
             {
                 // Shift + Enter = next line.
                 if (e.isShiftDown())
-                {
-                    
+                {                    
                 }
                 
-                txtInput.append("\n");
+                //txtInput.append("\n");
                 return;
                 //SendMSG();
 
