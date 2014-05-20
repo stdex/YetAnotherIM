@@ -322,9 +322,7 @@ public class NetworkThread implements Runnable, Opcode
         new TrayUtil("subscribe", s_contact, title);
         new NotificationWindow(senderGuid+" ("+nTime+")", message, 4000, "subscribe", s_contact, title);
         }
-        
-        
-                
+
         SendSubUI.readAllSubHistory(reciverGuid,title);
         // Output the message in sender ChatUI.
         //targetUI.append(Integer.toString(senderGuid), message, currentTime);

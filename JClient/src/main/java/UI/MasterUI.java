@@ -38,6 +38,7 @@ import static java.lang.Math.abs;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -92,7 +93,7 @@ public class MasterUI extends JFrame implements Opcode
     private JButton btnExit;
     private JButton btnReg;
     private JButton btnSubscribe;
-    private JButton btnOptions;
+    //private JButton btnOptions;
     
     private JTextField txtUsername;
     private JPasswordField txtPassword;
@@ -181,7 +182,7 @@ public class MasterUI extends JFrame implements Opcode
         btnReg = new JButton("Регистрация");
         //btnExit = new JButton("Выход");
         btnSubscribe = new JButton("Подписки");
-        btnOptions = new JButton("Настройки");
+        //btnOptions = new JButton("Настройки");
         
         btnLogin.setBackground(new Color(59, 89, 182));
         btnLogin.setForeground(Color.WHITE);
@@ -198,10 +199,12 @@ public class MasterUI extends JFrame implements Opcode
         btnSubscribe.setFocusPainted(false);
         btnSubscribe.setFont(new Font("Tahoma", Font.BOLD, 12));
         
+        /*
         btnOptions.setBackground(new Color(59, 89, 182));
         btnOptions.setForeground(Color.WHITE);
         btnOptions.setFocusPainted(false);
         btnOptions.setFont(new Font("Tahoma", Font.BOLD, 12));
+        */
         
         loginPanel.add(lblPassword);
         loginPanel.add(lblUsername);
@@ -248,21 +251,21 @@ public class MasterUI extends JFrame implements Opcode
         //contactPanel.add(btnRemoveContact);
         contactPanel.add(contactListPane);
         contactPanel.add(btnSubscribe);
-        contactPanel.add(btnOptions);
+        //contactPanel.add(btnOptions);
         
         lblTitle.setBounds(10, 10, 240, 25);
         //txtTitle.setBounds(10, 10, 240, 25);
         //lblPSM.setBounds(15, 35, 240, 25);
         //txtPSM.setBounds(15, 35, 240, 25);
-        cbStatus.setBounds(10, 40, 245, 25);
+        cbStatus.setBounds(10, 40, 125, 25);
         //btnAddContact.setBounds(10, 100, 120, 25);
         //btnRemoveContact.setBounds(135, 100, 120, 25);
-        contactListPane.setBounds(10, 110, 245, 230);
-        btnSubscribe.setBounds(10, 75, 110, 25);
-        btnOptions.setBounds(145, 75, 110, 25);
+        contactListPane.setBounds(10, 75, 245, 300);
+        btnSubscribe.setBounds(145, 40, 110, 25);
+        //btnOptions.setBounds(145, 75, 110, 25);
         
         loginPanel.setBounds(0, 0, 270, 500);
-        contactPanel.setBounds(270 , 0, 270, 350);
+        contactPanel.setBounds(270 , 0, 270, 380);
         
         lblTitle.setFont(new Font("sansserif", Font.BOLD, 16));
         lblTitle.setVisible(true);
@@ -651,12 +654,12 @@ public class MasterUI extends JFrame implements Opcode
         }
     };
     */
-    
+    /*
     FocusListener focusListener = new FocusAdapter()
     {
         public void focusLost(FocusEvent e)
         {
-            /*
+            
             if (e.getSource().equals(txtTitle))
             {
                 //txtTitle.setVisible(false);
@@ -671,10 +674,10 @@ public class MasterUI extends JFrame implements Opcode
                 lblPSM.setVisible(true);
                 
                 return;
-            }*/
+            }
         }
     };
-    
+    */
     KeyListener loginKeyListener = new KeyAdapter()
     {
         public void keyReleased(KeyEvent e)

@@ -37,11 +37,41 @@ public class TrayUtil {
 */
 
     public static Map<Object,Tdouble> mTrays = new HashMap<Object,Tdouble>();
+    public static Map<Object,Pdouble> aTrays = new HashMap<Object,Pdouble>();
     public static HashSet<Object> listContacts = new HashSet<Object>();
     public static HashSet<SystemTray> lTray = new HashSet<SystemTray>();
+    public static int showTray = 0;
+    public static boolean isFirstClick = false;
+    
+    public static TrayIcon tIcon;
+    public static SystemTray tR;
+    
+
+     /*
+    final static Image nullImage = new ImageIcon("").getImage();
+    final static URL resource = TrayUtil.class.getResource("/Images/icon_msg.png");
+    final static Image defalutImage = Toolkit.getDefaultToolkit().getImage(resource);
+    final static TrayIcon trayIcon = new TrayIcon(defalutImage);
+    final static SystemTray tray = SystemTray.getSystemTray();
+    */  
     
     public TrayUtil(String mode, Contact s_contact, String titlef) {
         
+        if(showTray == 0) {
+            createOneTray();
+        }
+        
+        showTray = 1;
+        
+        if(mode == "chat") {
+            aTrays.put(s_contact, new Pdouble(s_contact, mode));
+        }
+        else if(mode == "subscribe") {
+            aTrays.put(titlef, new Pdouble(titlef, mode));
+        }
+        
+        //System.out.println(aTrays.toString());
+        /*    
         if(mode == "chat") {
             if(!listContacts.contains(s_contact)) { 
                 createTray(mode, s_contact, titlef);
@@ -54,18 +84,94 @@ public class TrayUtil {
             }
             listContacts.add(titlef);
         }
-        
-        
+        */
 
     }
+    
+    public void createOneTray() {
 
+    final Image nullImage = new ImageIcon("").getImage();
+    URL resource = getClass().getResource("/Images/icon_msg.png");
+    final Image defalutImage = Toolkit.getDefaultToolkit().getImage(resource);
+  
+    final TrayIcon trayIcon = new TrayIcon(defalutImage);
+    final SystemTray tray = SystemTray.getSystemTray();
+    
+    tIcon = trayIcon;
+    tR = tray;
+    
+    Timer timer = null;
+        
+        if (SystemTray.isSupported()) {
+            try {
+                
+                trayIcon.addMouseListener(new MouseAdapter() {
+
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+
+                            for(Entry<Object, Pdouble> entry : aTrays.entrySet()) {
+                                
+                                if("chat".equals(entry.getValue().getMode())) {
+                                 ChatUI targetUI = UICore.getChatUIList().findUI((Contact) entry.getValue().getIdTray());
+
+                                 if (targetUI == null)
+                                     UICore.getChatUIList().add(targetUI = new ChatUI((Contact) entry.getValue().getIdTray()));
+
+
+                                 targetUI.toFront();
+                                }
+                                else if ("subscribe".equals(entry.getValue().getMode())) {
+                                     SendSubUI targetUI = UICore.getSubsUIList().findUI((String) entry.getValue().getIdTray());
+
+                                     if (targetUI == null)
+                                         UICore.getSubsUIList().add(targetUI = new SendSubUI((String) entry.getValue().getIdTray()));
+
+                                     targetUI.toFront();
+                                }
+                                
+                                aTrays.remove(entry.getKey());
+                                
+                                if(aTrays.isEmpty())
+                                {
+                                  tray.remove(trayIcon);
+                                  aTrays.clear();
+                                  showTray = 0;
+                                }
+                                
+                                break;
+                            }                        
+                    }
+                });
+                
+                tray.add(trayIcon);
+            } catch (AWTException ex) {
+                System.err.println(ex.getMessage());
+            }
+            if (timer == null) {
+                timer = new Timer(500, new ActionListener() {
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if (trayIcon.getImage() == nullImage) {
+                            trayIcon.setImage(defalutImage);
+                        } else {
+                            trayIcon.setImage(nullImage);
+                        }
+                    }
+                });
+            }
+        }
+        
+        startBlink(timer);        
+        
+    }
+
+    /*
     public void createTray(final String mode, final Contact s_contact, final String titlef) {
   
       
     final Image nullImage = new ImageIcon("").getImage();
-    /*
-    final Image defalutImage = new ImageIcon(this.getClass().getResource("/Images/icon_msg.png")).getImage();
-    */
     URL resource = getClass().getResource("/Images/icon_msg.png");
     System.out.println(resource.toString());
     final Image defalutImage = Toolkit.getDefaultToolkit().getImage(resource);
@@ -108,7 +214,7 @@ public class TrayUtil {
                         tray.remove(trayIcon);
                         mTrays.remove(idTray);
                         listContacts.remove(idTray);
-                        /*
+
                         TrayUtil frame = (TrayUtil) UIPools.getUI("mainFrame");
                         if (frame.isVisible()) {
                             frame.setVisible(false);
@@ -116,7 +222,7 @@ public class TrayUtil {
                             frame.setVisible(true);
                             frame.setExtendedState(JFrame.NORMAL);
                         }
-                                */
+
                     }
                 });
                 tray.add(trayIcon);
@@ -140,6 +246,7 @@ public class TrayUtil {
         
         startBlink(timer);
     }
+    */
 
     public void startBlink(Timer timer) {
         if (timer != null) {
@@ -177,6 +284,25 @@ public class TrayUtil {
                 mTrays.remove(idTray);
                 listContacts.remove(idTray);
             }
+        }
+        
+    }
+    
+        
+    public static void disposeOneTray(Contact s_contact, String titlef) {
+    
+        Object idTray = (s_contact != null)?s_contact:titlef;
+        
+        System.out.println(idTray);
+        
+        aTrays.remove(idTray);
+        System.out.println(aTrays);
+        
+        if(aTrays.isEmpty())
+        {
+            tR.remove(tIcon);
+            aTrays.clear();
+            showTray = 0;
         }
         
     }

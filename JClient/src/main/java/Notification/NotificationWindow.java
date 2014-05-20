@@ -76,7 +76,8 @@ public class NotificationWindow extends javax.swing.JDialog implements TimedEven
                       public void mouseClicked(MouseEvent me){                   
               
                    if(mode == "chat") {
-                        TrayUtil.disposeMsgTray(s_contact, "");
+                        TrayUtil.disposeOneTray(s_contact, "");
+                        //TrayUtil.disposeMsgTray(s_contact, "");
                         ChatUI targetUI = UICore.getChatUIList().findUI(s_contact);
 
                         if (targetUI == null)
@@ -87,7 +88,8 @@ public class NotificationWindow extends javax.swing.JDialog implements TimedEven
                     targetUI.toFront();
                    }
                    else if (mode == "subscribe") {
-                        TrayUtil.disposeMsgTray(null, titlef);
+                         TrayUtil.disposeOneTray(null, titlef);
+                        //TrayUtil.disposeMsgTray(null, titlef);
                         SendSubUI targetUI = UICore.getSubsUIList().findUI(titlef);
                         
                         //System.out.println(mode+" :: "+" :: "+titlef+" :: "+targetUI);
